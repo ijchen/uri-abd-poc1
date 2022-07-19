@@ -1,0 +1,53 @@
+The object I have access to that seems to contain the "logic" is an automl "SupervisedModel"
+
+SupervisedModel instances seem to store the logic in the private field
+"comparison", which is a Vec<Model>
+https://docs.rs/automl/0.2.6/src/automl/lib.rs.html#167
+
+Model is defined here:
+https://docs.rs/automl/0.2.6/src/automl/lib.rs.html#841
+and appears to store the core logic of the model in the private field "model",
+which is a Vec<u8>... so a generic vector of bytes. That's slightly concerning
+
+In .predict(), that vector of bytes is passed to various "predict" functions,
+which probably know how to interpret the vector of bytes
+https://docs.rs/automl/0.2.6/src/automl/lib.rs.html#631
+
+linear regression specifically passes the vector of bytes as the second argument
+to LinearRegressorWrapper::predict()
+https://docs.rs/automl/0.2.6/src/automl/lib.rs.html#633
+defined in "algorithms", which for some reason I can't link to from docs.rs.
+Maybe no part of it needs to be publicly visible?
+https://github.com/cmccomb/rust-automl/blob/master/src/algorithms/linear_regressor.rs#L50
+
+aha! It calls a function called bincode::deserialize(), passing the vector of
+bytes. This has got to be getting close.
+https://github.com/cmccomb/rust-automl/blob/master/src/algorithms/linear_regressor.rs#L52
+
+okay turns out "bincode" is just a crate for serializing and deserializing
+objects in memory, but I found where it's serialized, and what it is before
+serialization - it's a LinearRegression<f32, DenseMatrix<f32>> from smartcore!
+https://github.com/cmccomb/rust-automl/blob/master/src/algorithms/linear_regressor.rs#L51
+https://github.com/cmccomb/rust-automl/blob/master/src/algorithms/linear_regressor.rs#L35
+
+The vector of bytes is a serialized representation of a smartcore
+LinearRegression instance, let's dig into that:
+https://docs.rs/smartcore/latest/smartcore/linear/linear_regression/struct.LinearRegression.html
+https://docs.rs/smartcore/latest/src/smartcore/linear/linear_regression.rs.html#94
+
+Aha! It has a method to get the coefficients and intercept of the model!
+https://docs.rs/smartcore/latest/smartcore/linear/linear_regression/struct.LinearRegression.html#method.coefficients
+https://docs.rs/smartcore/latest/smartcore/linear/linear_regression/struct.LinearRegression.html#method.intercept
+
+So in theory, if I'm able to read the model's private field that contains the
+serialized LinearRegression instance, deserialize that with bincode, then call
+the coefficients() and intercept() functions, I should be able to extract the
+information I need!
+
+okay great so I just have to access a private field from a separate crate in one
+of the most safety-restrictive programming languages I've ever used :smile:
+
+The even more fun part is that smartcore does *not* expose the internals of
+DecisionTreeRegressor like they do for LinearRegression. It's all privately
+stored here :smile_but_even_more_sarcastic:
+https://docs.rs/smartcore/latest/src/smartcore/tree/decision_tree_regressor.rs.html#92

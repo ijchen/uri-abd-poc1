@@ -1,0 +1,31 @@
+Here is an example usage:
+--------------------------------------------------------------------------------
+Do you already have a trained model saved? (Y/N): 
+N
+Please enter the testing inputs file path: training_data/cityblock_vertex_degree_x.npy
+Please enter the matching expected outputs file path: training_data/cityblock_vertex_degree_y.npy
+Training dataset loaded
+
+Choose a regression algorithm to use
+1. Linear regression
+2. Decision tree regression
+2
+
+Model trained
+┌─────────────────────────┬───────────────────┬──────────────┬─────────────┐
+│ Model                   │ Time              │ Training R^2 │ Testing R^2 │
+╞═════════════════════════╪═══════════════════╪══════════════╪═════════════╡
+│ Decision Tree Regressor │ 308ms 887us 400ns │ 0.58         │ 0.58        │
+└─────────────────────────┴───────────────────┴──────────────┴─────────────┘
+┌──────────────────┬──────────────┬─────────────┐
+│ Meta Model       │ Training R^2 │ Testing R^2 │
+╞══════════════════╪══════════════╪═════════════╡
+│ Linear Regressor │ NaN          │ NaN         │
+└──────────────────┴──────────────┴─────────────┘
+This is the part where you'd make predictions using the model. Instead, have a smiley face: ツ
+
+Would you like to save the model to disk? (Y/N):
+Y
+Please enter the new trained model (usually a .aml) file path: output.aml
+Model saved to disk.
+--------------------------------------------------------------------------------
