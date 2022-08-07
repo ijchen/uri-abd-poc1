@@ -37,7 +37,7 @@ fn save_to_disk(model: SupervisedModel) {
 
 fn main() {
     // Load the model, or generate and train one
-    let model = if user_input::yes_or_no("Do you already have a trained model saved?") {
+    let mut model = if user_input::yes_or_no("Do you already have a trained model saved?") {
         let path = user_input::get_file_path("trained model", false);
         SupervisedModel::new_from_file(&path)
     } else {
