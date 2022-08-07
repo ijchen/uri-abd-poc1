@@ -45,8 +45,12 @@ fn main() {
     };
 
     // Make predictions (or otherwise use the model) here
-    println!("This is the part where you'd make predictions using the model. Instead, have a smiley face: ツ");
-    println!();
+    let foo = model.predict(vec![
+        vec![3.1, 4.1, 5.9, 2.6, 5.3, 5.8],
+    ]);
+    println!("Prediction: {foo:?}");
+    // println!("This is the part where you'd make predictions using the model. Instead, have a smiley face: ツ");
+    // println!();
 
     // Give the option to save the model to disk
     if user_input::yes_or_no("Would you like to save the model to disk?") {
